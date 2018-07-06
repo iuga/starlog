@@ -6,14 +6,14 @@ R library to entry log records to track the experiments you run, the context and
 
 ## Installation
 
-```{r}
+``` r
 #install.packages("devtools")
 devtools::install_github("iuga/starlog")
 ```
 ## Usage
 
-```{r}
-library()
+``` r
+library(starlog)
 
 log_experiment(
     # Entry log information:
