@@ -7,8 +7,6 @@
 # In other words, this library is going to help you to
 # keep track the experiments you run, the context and its results.
 #
-library(stargazer)
-library(data.table)
 
 #'
 #' Create an experiment entry log
@@ -76,8 +74,8 @@ log_experiment <- function(..., description='', tag='', version='1.0', number=1,
     # Write all information
     input_list <- list(...)
     lapply(X=input_list, function(x){
-        if(is.data.frame(x) | is.data.table(x)){
-            s = stargazer(x, type = 'text', summary = FALSE, digits=5)
+        if(is.data.frame(x) | data.table::is.data.table(x)){
+            s = stargazer::stargazer(x, type = 'text', summary = FALSE, digits=5)
             cat(paste(s, "\n"), file=logfile, append=TRUE)
         } else if(x=='' || (typeof(x)=='character' && length(x)==0)){
             cat("", append=TRUE, file=logfile, sep='\n')
