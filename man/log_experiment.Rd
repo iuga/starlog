@@ -28,7 +28,7 @@ information passed refered to an experiment, the context and the result.
 All the information should be passed a ... parameters.
 Empty characters are considered new lines.
 
-Supports: characters, numbers, data.frames, lists, vectors, etc.
+Supports: characters, numbers, data.frames, lists, vectors, ggplots.
 }
 \examples{
 log_experiment(

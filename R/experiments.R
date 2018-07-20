@@ -17,7 +17,7 @@
 #' All the information should be passed a ... parameters.
 #' Empty characters are considered new lines.
 #'
-#' Supports: characters, numbers, data.frames, lists, vectors, etc.
+#' Supports: characters, numbers, data.frames, lists, vectors, ggplots.
 #'
 #' @param ... all the objects and information you want to log. We recommend a ("title", value, "") format.
 #' @param description containing the main information of you experiment. E.g: Testing the max_date new feature
@@ -71,18 +71,38 @@ log_experiment <- function(..., description='', tag='', version='1.0', number=1,
     cat(stardate, sep='\n', append=TRUE, file=logfile)
     cat("", append=TRUE, file=logfile, sep='\n')
 
+    # Number of objects to export
+    number_exports <- 1
+
     # Write all information
     input_list <- list(...)
-    lapply(X=input_list, function(x){
+    for(x in input_list){
         if(is.data.frame(x) | data.table::is.data.table(x)){
+            # Data Frames and Data Tables
             s = stargazer::stargazer(x, type = 'text', summary = FALSE, digits=5)
             cat(paste(s, "\n"), file=logfile, append=TRUE)
         } else if(x=='' || (typeof(x)=='character' && length(x)==0)){
+            # Text
             cat("", append=TRUE, file=logfile, sep='\n')
+        } else if(is.ggplot(x)){
+            # GGplot / Patchwork
+            if(tag == ''){
+                plot_filename <- paste0(folder, "exp.", version, ".", number, "-", letters[number_exports], ".png")
+            } else {
+                plot_filename <- paste0(folder, "exp.", tag, ".", version, ".", number, "-", letters[number_exports], ".png")
+            }
+            if(file.exists(plot_filename)){
+                stop(paste("Plot file", plot_filename, "already exists. Manually delete the file and try again or you can loose information."))
+            }
+            ggsave(filename = plot_filename, plot=x)
+            cat(plot_filename, append=TRUE, file=logfile, sep='\n')
+            number_exports <- number_exports + 1
         } else {
+            # New lines
             cat(x, file = logfile, append = TRUE, sep='\n')
         }
-    })
+
+    }
 
     # If everything was successfull, write an entry in the capitans log:
     capitan_log(stardate=stardate, description=description, version=version, number=number, folder=folder)
