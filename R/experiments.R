@@ -143,7 +143,7 @@ capitan_log <- function(stardate=as.character(Sys.time()), description='', versi
     # Folder must end with / and exist
     create_folders(folder)
     # Capitan's log filename
-    logfile <- paste0(folder, "capitan.log")
+    logfile <- file.path(folder, "capitan.log")
     # Append the summary
     cat(paste0("\n• Experiment v:", version, ".", number, " - Stardate: ", stardate, collapse=''), sep='\n', append=TRUE, file=logfile)
     cat(paste0("\t", description), append=TRUE, file=logfile, sep='\n')
