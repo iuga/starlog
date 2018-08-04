@@ -5,7 +5,7 @@
 \title{Create an experiment entry log}
 \usage{
 log_experiment(..., description = "", tag = "", version = "1.0",
-  number = 1, folder = "./logs/")
+  number = 1, folder = "./logs")
 }
 \arguments{
 \item{...}{all the objects and information you want to log. We recommend a ("title", value, "") format.}
@@ -27,6 +27,12 @@ information passed refered to an experiment, the context and the result.
 \details{
 All the information should be passed a ... parameters.
 Empty characters are considered new lines.
+
+Folder Structure:
+ ./{folder}
+     ./capitans.log
+     ./{version}
+          ./exp.{tag}.{version}.{number}.txt
 
 Supports: characters, numbers, data.frames, lists, vectors, ggplots.
 }

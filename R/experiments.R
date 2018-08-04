@@ -17,6 +17,12 @@
 #' All the information should be passed a ... parameters.
 #' Empty characters are considered new lines.
 #'
+#' Folder Structure:
+#'  ./{folder}
+#'      ./capitans.log
+#'      ./{version}
+#'           ./exp.{tag}.{version}.{number}.txt
+#'
 #' Supports: characters, numbers, data.frames, lists, vectors, ggplots.
 #'
 #' @param ... all the objects and information you want to log. We recommend a ("title", value, "") format.
@@ -37,19 +43,24 @@
 #'     "Final AUC:", 0.789, ""
 #' )
 #'
-log_experiment <- function(..., description='', tag='', version='1.0', number=1, folder='./logs/'){
+log_experiment <- function(..., description='', tag='', version='1.0', number=1, folder='./logs'){
     # Star date
     stardate <- as.character(Sys.time())
 
     # Folder must end with / and exist
-    create_folders(folder)
+    vfolder <- file.path(folder, version)
+    create_folders(vfolder)
+
+    print(vfolder)
 
     # Open the file
     if(tag == ''){
-        logfile <- paste0(folder, "exp.", version, ".", number, ".txt")
+        logfile <- file.path(vfolder, paste0("exp.", version, ".", number, ".txt"))
     } else {
-        logfile <- paste0(folder, "exp.", tag, ".", version, ".", number, ".txt")
+        logfile <- file.path(vfolder, paste0("exp.", tag, ".", version, ".", number, ".txt"))
     }
+
+    print(logfile)
 
     # If the file exist fail with an error.
     # We don't want to override a previous experiment information
@@ -58,17 +69,19 @@ log_experiment <- function(..., description='', tag='', version='1.0', number=1,
     }
 
     # Write Summary
-    cat(paste0("\nExperiment #", number, " (v:",version, ")", collapse=''), sep='\n', append=TRUE, file=logfile)
+    if(tag == ''){
+        cat(paste0("\nExperiment #", number, " (v:",version, ")", collapse=''), sep='\n', append=TRUE, file=logfile)
+    } else {
+        cat(paste0("\nExperiment #", number, " (v:",version, "-", tag,")", collapse=''), sep='\n', append=TRUE, file=logfile)
+    }
+    # Experiment execution date and time
+    cat("StarDate: ", append=TRUE, file=logfile)
+    cat(stardate, sep='\n', append=TRUE, file=logfile)
     cat("", append=TRUE, file=logfile, sep='\n')
 
     # Write Description
-    cat("Description:", append=TRUE, file=logfile, sep='\n')
+    cat("Capitan's log:", append=TRUE, file=logfile, sep='\n')
     cat(description, append=TRUE, file=logfile, sep='\n')
-    cat("", append=TRUE, file=logfile, sep='\n')
-
-    # Experiment execution date and time
-    cat("Execution Date and Time: ", sep='\n', append=TRUE, file=logfile)
-    cat(stardate, sep='\n', append=TRUE, file=logfile)
     cat("", append=TRUE, file=logfile, sep='\n')
 
     # Number of objects to export
@@ -84,12 +97,12 @@ log_experiment <- function(..., description='', tag='', version='1.0', number=1,
         } else if(x=='' || (typeof(x)=='character' && length(x)==0)){
             # Text
             cat("", append=TRUE, file=logfile, sep='\n')
-        } else if(is.ggplot(x)){
+        } else if(ggplot2::is.ggplot(x)){
             # GGplot / Patchwork
             if(tag == ''){
-                plot_filename <- paste0(folder, "exp.", version, ".", number, "-", letters[number_exports], ".png")
+                plot_filename <- paste0(vfolder, "exp.", version, ".", number, "-", letters[number_exports], ".png")
             } else {
-                plot_filename <- paste0(folder, "exp.", tag, ".", version, ".", number, "-", letters[number_exports], ".png")
+                plot_filename <- paste0(vfolder, "exp.", tag, ".", version, ".", number, "-", letters[number_exports], ".png")
             }
             if(file.exists(plot_filename)){
                 stop(paste("Plot file", plot_filename, "already exists. Manually delete the file and try again or you can loose information."))
@@ -101,7 +114,6 @@ log_experiment <- function(..., description='', tag='', version='1.0', number=1,
             # New lines
             cat(x, file = logfile, append = TRUE, sep='\n')
         }
-
     }
 
     # If everything was successfull, write an entry in the capitans log:
