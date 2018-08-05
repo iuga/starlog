@@ -51,16 +51,12 @@ log_experiment <- function(..., description='', tag='', version='1.0', number=1,
     vfolder <- file.path(folder, version)
     create_folders(vfolder)
 
-    print(vfolder)
-
     # Open the file
     if(tag == ''){
         logfile <- file.path(vfolder, paste0("exp.", version, ".", number, ".txt"))
     } else {
         logfile <- file.path(vfolder, paste0("exp.", tag, ".", version, ".", number, ".txt"))
     }
-
-    print(logfile)
 
     # If the file exist fail with an error.
     # We don't want to override a previous experiment information
@@ -100,9 +96,9 @@ log_experiment <- function(..., description='', tag='', version='1.0', number=1,
         } else if(ggplot2::is.ggplot(x)){
             # GGplot / Patchwork
             if(tag == ''){
-                plot_filename <- paste0(vfolder, "exp.", version, ".", number, "-", letters[number_exports], ".png")
+                plot_filename <- file.path(vfolder, paste0("exp.", version, ".", number, "-", letters[number_exports], ".png"))
             } else {
-                plot_filename <- paste0(vfolder, "exp.", tag, ".", version, ".", number, "-", letters[number_exports], ".png")
+                plot_filename <- file.path(vfolder, paste0("exp.", tag, ".", version, ".", number, "-", letters[number_exports], ".png"))
             }
             if(file.exists(plot_filename)){
                 stop(paste("Plot file", plot_filename, "already exists. Manually delete the file and try again or you can loose information."))
